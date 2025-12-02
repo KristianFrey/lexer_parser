@@ -1,4 +1,6 @@
 __pycache__/
 .vscode/
 *.png
-parset.out
+*.dot
+parser.out
+parsetab.py
