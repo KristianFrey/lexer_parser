@@ -134,7 +134,7 @@ def p_lista_fluxos_continua(p):
     else:
         p[0] = []
         
-# O que seria algo vazio
+# Vazio
 def p_empty(p):
     "empty :"
     pass
@@ -164,13 +164,13 @@ def validar_modelo(modelo):
         if a.get('tipo') == 'gateway' and len(seguinte) < 2:
             raise Exception(f"Erro Semântico: Gateway '{nome}' precisa de pelo menos 2 saídas (condicionais).")
         
-        # Verifica se o destino é uma atividade ou fim
+        # Verifica se o destino (o próximo do anterior) é uma atividade ou fim
         for cond, dest in seguinte:
             if dest != 'fim' and dest not in atividades:
                 raise Exception(f"Erro Semântico: O destino '{dest}' da atividade '{nome}' não está definido.")
             if dest == 'fim' and not fim_processo:
                  print(f"Aviso Semântico: Atividade '{nome}' aponta para 'fim', mas a propriedade 'fim' do processo não está definida.")
-        # Verifica se tem nome ou responsável
+        # Verifica se tem nome ou responsável (nas atividades)
         if 'nome' not in a or 'responsavel' not in a:
              print(f"Aviso Semântico: Atividade '{nome}' faltando propriedades essenciais (nome/responsavel).")
 
