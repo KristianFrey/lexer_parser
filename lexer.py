@@ -31,32 +31,40 @@ t_VIRGULA = r','
 t_PONTO_VIRGULA = r';'
 t_SETA = r'->'
 
+# Reconhece palavras em Strings, por meio de expressão regular.
 def t_LIT_STRING(t):
     r'\"[^\"]*\"'
-    # Remove as aspas
+    # Esquema utilizado para pegar o segundo valor e o penúltimo para evitar as aspas.
     t.value = t.value[1:-1]
     return t
 
+# Reconhece números, por meio de expressão regular.
 def t_NUMERO(t):
     r'\d+'
+    # Converte a string em valor.
     t.value = int(t.value)
     return t
 
+# Procura palavras reservadas.
 def t_ID_VARIAVEL(t):
     r'[a-zA-Z_][a-zA-Z_0-9]*'
-    # Checa por palavras reservadas
+    # Atribui o token correto com base no dicinário
     t.type = reserved.get(t.value, 'ID_VARIAVEL')
     return t
 
+# Caracteres a serem ignorados
 t_ignore = ' \t'
 
+# Conta o número de linhas para apresentar o erro.
 def t_newline(t):
     r'\n+'
     t.lexer.lineno += len(t.value)
 
+# Tratamento de erro, quando encontra um caractere que não segue as regras
 def t_error(t):
-    # Não levanta exceção, apenas imprime (o parser fará o controle de erro principal)
+    # Não descontinua o programa, apenas imprime (o parser fará o controle de erro principal)
     print(f"Caractere ilegal '{t.value[0]}' na linha {t.lexer.lineno}")
+    # Pula o caractere que deu erro.
     t.lexer.skip(1)
 
 lexer = lex.lex()

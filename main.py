@@ -11,10 +11,8 @@ def gerar_dot(modelo, nome_arquivo) -> bool:
     dot += '    rankdir=LR;\n'
     dot += '    Start [shape=Mdiamond, label="Início do Processo"];\n'
     dot += '    End [shape=Msquare, label="Fim do Processo"];\n\n'
-    
-    # 1. Definição dos nós (Atividades)
+
     for nome, a in modelo['atividades'].items():
-        # CORREÇÃO: Usar .get() para propriedades opcionais (tempo, custo),
         # pois gateways ou outras atividades podem não tê-las.
         tempo = a.get('tempo', 'N/A')
         custo = a.get('custo', 'N/A')
