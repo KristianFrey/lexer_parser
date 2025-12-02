@@ -174,7 +174,7 @@ Execute o compilador passando o arquivo `.dsl` como argumento:
 - `exemplo.dsl`: Arquivo de exemplo com sintaxe da DSL
 - `requirements.txt`: Dependências Python do projeto
 
-### Pipeline de Compilação
+### Ordem de Compilação
 
 ```
 Arquivo .dsl
@@ -189,13 +189,3 @@ Arquivo .dsl
     ↓
 [Graphviz] → Imagem PNG
 ```
-
----
-
-## ⚙️ Tecnologias Utilizadas
-
-- **Python 3.x**: Linguagem base do projeto
-- **PLY (Python Lex-Yacc)**: Framework para construção de lexers e parsers
-- **Graphviz**: Renderização de grafos DOT em imagens
-- **pydot**: Interface Python para o Graphviz
-- **Pillow**: Processamento de imagens auxiliar
