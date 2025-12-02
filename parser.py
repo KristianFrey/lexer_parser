@@ -168,6 +168,11 @@ def validar_modelo(modelo):
     for nome, a in atividades.items():
         seguinte = a.get('seguinte', []) 
         
+        # Validação de cardinalidade de tarefas: máximo 1 saída
+        if a.get('tipo') == 'tarefa' and len(seguinte) > 1:
+            raise Exception(f"Erro Semântico: Tarefa '{nome}' tem múltiplas saídas ({len(seguinte)}); use gateway para fluxos condicionais.")
+        
+        # Validação de cardinalidade de gateways: mínimo 2 saídas
         if a.get('tipo') == 'gateway' and len(seguinte) < 2:
             raise Exception(f"Erro Semântico: Gateway '{nome}' precisa de pelo menos 2 saídas (condicionais).")
         
@@ -176,10 +181,10 @@ def validar_modelo(modelo):
                 raise Exception(f"Erro Semântico: O destino '{dest}' da atividade '{nome}' não está definido.")
             # Validação: Se o destino for 'fim', checa se o processo tem a propriedade fim definida (semântica)
             if dest == 'fim' and not fim_processo:
-                 print(f"⚠️ Aviso Semântico: Atividade '{nome}' aponta para 'fim', mas a propriedade 'fim' do processo não está definida.")
+                 print(f"Aviso Semântico: Atividade '{nome}' aponta para 'fim', mas a propriedade 'fim' do processo não está definida.")
 
         if 'nome' not in a or 'responsavel' not in a:
-             print(f"⚠️ Aviso Semântico: Atividade '{nome}' faltando propriedades essenciais (nome/responsavel).")
+             print(f"Aviso Semântico: Atividade '{nome}' faltando propriedades essenciais (nome/responsavel).")
 
 
 # -------------------------

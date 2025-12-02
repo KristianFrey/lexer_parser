@@ -1,0 +1,8 @@
+ply
+pydot
+pillow
+
+# Graphviz deve estar instalado no sistema.
+#   Windows:
+#     winget install graphviz
+#     Após a instalação, adiciona o diretório bin do Graphviz ao PATH (geralmente C:\Program Files\Graphviz\bin)

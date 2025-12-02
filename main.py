@@ -1,7 +1,9 @@
 import sys
-from parser import parser, validar_modelo # Importa as funções corrigidas
+import os
+from parser import parser, validar_modelo
 
-def gerar_dot(modelo, nome_arquivo="processo.dot"):
+
+def gerar_dot(modelo, nome_arquivo) -> bool:
     """
     Gera um arquivo Graphviz DOT para visualizar o modelo de processo.
     """
@@ -46,40 +48,76 @@ def gerar_dot(modelo, nome_arquivo="processo.dot"):
     try:
         with open(nome_arquivo, "w", encoding="utf-8") as f:
             f.write(dot)
-        print(f"✅ Arquivo DOT '{nome_arquivo}' gerado com sucesso!")
-        print("   Use um visualizador de DOT (ex: Graphviz, ou um visualizador online) para ver o diagrama.")
+        return True
     except IOError as e:
-        print(f"❌ Erro ao escrever o arquivo DOT: {e}")
+        print(f"Erro ao escrever o arquivo DOT: {e}")
+        return False
 
-# -----------------------------
-# LEITURA DO ARQUIVO DSL
-# -----------------------------
+
+def dot_para_png(filename: str, output_png: str = "processo.png") -> bool:
+    try:
+        import pydot
+        with open(filename, 'r', encoding='utf-8') as f:
+            conteudo = f.read()
+        graphs = pydot.graph_from_dot_data(conteudo)
+        graph = graphs[0]
+        graph.write_png(output_png)
+        return True
+    
+    except ImportError:
+        print("pydot não está instalado. Instale-o para converter DOT para PNG.")
+        return False
+    
+    except Exception as e:
+        print(f"Erro ao converter DOT para PNG: {e}")
+        return False
+
 
 if __name__ == "__main__":
-    if len(sys.argv) != 2:
-        print("Uso: python main.py <nome_do_arquivo>.dsl")
-        sys.exit(1)
-        
-    nome_arquivo_dsl = sys.argv[1]
+    
+    # Se nenhum parâmetro for passado, pede o nome do arquivo
+    if len(sys.argv) == 1:
+        nome_arquivo_dsl = input("Digite o nome do arquivo DSL: ")
+    
+    # Se um parâmetro passado, extrai o nome do arquivo
+    elif len(sys.argv) == 2:
+        nome_arquivo_dsl = sys.argv[1]
+    
+    else:
+        raise ValueError("Número incorreto de argumentos. Use: python main.py <nome_do_arquivo>.dsl")
+    
+    # Verifica se o arquivo existe antes de continuar
+    if not os.path.exists(nome_arquivo_dsl):
+        raise FileNotFoundError(f"Arquivo '{nome_arquivo_dsl}' não encontrado.")
 
     try:
+        nome_base = os.path.splitext(nome_arquivo_dsl)[0]
+
+        # Lê o conteúdo do arquivo DSL
+        print(f"\nProcessando o arquivo '{nome_arquivo_dsl}'...")
         with open(nome_arquivo_dsl, "r", encoding="utf-8") as f:
             codigo = f.read()
 
-        print(f"📄 Analisando o arquivo '{nome_arquivo_dsl}'...")
-        # Adicione o set_debug=True no yacc.yacc() se precisar depurar a gramática
-        modelo = parser.parse(codigo)
-        
-        print("✅ Análise Sintática concluída.")
+        modelo = parser.parse(codigo)       
+        print("Análise Sintática concluída.")
         
         validar_modelo(modelo)
-        print("✅ Validação Semântica concluída.")
+        print("Validação Semântica concluída.")
 
         # Inicia a geração do DOT (interpretação/criação do artefato)
-        gerar_dot(modelo)
+        if gerar_dot(modelo, nome_arquivo=f"{nome_base}.dot"):
+            print("Arquivo .dot gerado com sucesso.")
+        else:
+            print("Erro ao gerar o arquivo .dot.")
 
-    except FileNotFoundError:
-        print(f"❌ Erro: Arquivo '{nome_arquivo_dsl}' não encontrado.")
+        # Tenta converter o DOT para PNG
+        nome_arquivo_png = nome_arquivo_dsl.replace('.dsl', '.png')
+        if dot_para_png(f"{nome_base}.dot", nome_arquivo_png):
+            print(f"Arquivo '{nome_arquivo_png}' gerado com sucesso.")
+        else:
+            print("Não foi possível gerar o arquivo PNG.")
+            print("Para visualuizar o diagrama, use um visualizador de arquivos DOT.")
+
     except (SyntaxError, Exception) as e:
         # Captura erros de sintaxe (do parser) e erros semânticos/KeyError
-        print(f"❌ Erro no processamento: {e}")
+        print(f"Erro no processamento: {e}")
